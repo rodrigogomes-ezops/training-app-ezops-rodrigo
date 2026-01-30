@@ -44,8 +44,7 @@ tags_cloudfront_oai = {
 cloudfront_comment             = "CloudFront Distribution para frontend"
 cloudfront_default_root_object  = "index.html"
 cloudfront_price_class         = "PriceClass_All"
-# cloudfront_aliases             = ["rodrigo-testes.ezopscloud.co"]
-cloudfront_aliases             = []
+cloudfront_aliases             = ["rodrigo-testes.ezopscloud.co"]
 cloudfront_origin_id           = "S3-rodrigo-frontend-bucket"
 
 # Comportamento padrão

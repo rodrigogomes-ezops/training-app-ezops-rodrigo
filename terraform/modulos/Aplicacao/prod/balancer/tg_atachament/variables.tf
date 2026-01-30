@@ -15,7 +15,7 @@ variable "target_port" {
 }
 
 variable "target_az" {
-  description = "Mapa opcional de Availability Zone por target (ex.: us-east-1a). Necessário quando o IP não está na VPC."
+  description = "Mapa opcional de Availability Zone por target (ex.: us-east-2a). Necessário quando o IP não está na VPC."
   type        = map(string)
   default     = {}
 }

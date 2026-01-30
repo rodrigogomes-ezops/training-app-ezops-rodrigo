@@ -68,14 +68,18 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          CLEAN_REPO="$(echo "$ECR_REPOSITORY" | tr -d '[:space:]')"
+          CLEAN_REPO="$(echo "$ECR_REPOSITORY" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')"
+          # Se o secret vier com o registry completo, remove o prefixo
+          CLEAN_REPO="${CLEAN_REPO#${ECR_REGISTRY}/}"
           if [ -z "$CLEAN_REPO" ]; then
             echo "ECR_REPOSITORY is empty. Set it to your ECR repo name (e.g. training-app-backend)."
             exit 1
           fi
-          docker build -t "$ECR_REGISTRY/$CLEAN_REPO:$IMAGE_TAG" ./backend
-          docker push "$ECR_REGISTRY/$CLEAN_REPO:$IMAGE_TAG"
-          docker tag "$ECR_REGISTRY/$CLEAN_REPO:$IMAGE_TAG" "$ECR_REGISTRY/$CLEAN_REPO:latest"
+          IMAGE_URI="$ECR_REGISTRY/$CLEAN_REPO:$IMAGE_TAG"
+          echo "Using image: $IMAGE_URI"
+          docker build -t "$IMAGE_URI" ./backend
+          docker push "$IMAGE_URI"
+          docker tag "$IMAGE_URI" "$ECR_REGISTRY/$CLEAN_REPO:latest"
           docker push "$ECR_REGISTRY/$CLEAN_REPO:latest"
 
       - name: Baixar task definition atual

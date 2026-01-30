@@ -36,11 +36,11 @@ module "security_group_rds" {
   vpc_id      = module.vpc_app.vpc_id
   ingress_rules = [
     {
-      description     = "Acesso do ECS (MySQL)"
+      description     = "Acesso das subnets privadas (MySQL)"
       from_port       = 3306
       to_port         = 3306
       protocol        = "tcp"
-      security_groups = [module.security_group_ecs.security_group_id]
+      cidr_blocks     = values(var.subnet_cidr_blocks_private)
     }
   ]
   egress_rules = [
