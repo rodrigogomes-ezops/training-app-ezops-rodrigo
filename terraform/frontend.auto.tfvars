@@ -62,7 +62,7 @@ cloudfront_custom_error_responses = []
 cloudfront_restriction_type     = "none"
 cloudfront_restriction_locations = []
 
-cloudfront_acm_certificate_arn      = "arn:aws:acm:us-east-2:618889059366:certificate/93bf1dc7-0f7d-41d0-81ae-137731d83f4b"
+cloudfront_acm_certificate_arn      = "arn:aws:acm:us-east-1:618889059366:certificate/0ce29a92-d25e-4257-a7c8-3880a16e7c8a"
 cloudfront_minimum_protocol_version = "TLSv1.2_2021"
 cloudfront_ssl_support_method      = "sni-only"
 
