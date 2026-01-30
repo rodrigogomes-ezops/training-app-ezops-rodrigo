@@ -23,7 +23,7 @@ module "alb_backend" {
   internal                = var.alb_internal
   type                    = "application"
   security_group_ids      = [module.security_group_alb.security_group_id]
-  subnet_ids              = module.subnet_public.public_subnet_id
+  subnet_ids              = module.subnet_private.private_subnet_id
   enable_deletion_protection = var.alb_enable_deletion_protection
   access_logs_bucket      = var.alb_access_logs_bucket
   access_logs_prefix      = var.alb_access_logs_prefix
