@@ -174,7 +174,6 @@ module "ecs_service" {
   enable_execute_command             = var.ecs_enable_execute_command
   service_registry = {
     registry_arn   = aws_service_discovery_service.backend.arn
-    port           = var.ecs_container_port
     container_name = var.ecs_container_name
   }
   tags                                = var.tags_ecs_service
