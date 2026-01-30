@@ -1,0 +1,25 @@
+groups:
+  - name: training-app
+    rules:
+      - alert: BackendDown
+        expr: max(up{job="backend"}) < 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend is down"
+          description: "Prometheus cannot scrape the backend for more than 1 minute."
+
+      - alert: High5xxRate
+        expr: |
+          (
+            sum(rate(http_request_duration_seconds_count{status_code=~"5.."}[5m]))
+            /
+            sum(rate(http_request_duration_seconds_count[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High 5xx rate"
+          description: "5xx responses are above 5% for 5 minutes."

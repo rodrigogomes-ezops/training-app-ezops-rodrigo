@@ -1,0 +1,47 @@
+name: Deploy Monitoring Images
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'monitoring/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    name: Build & Push Prometheus/Grafana
+    runs-on: ubuntu-latest
+    env:
+      PROMETHEUS_REPOSITORY: prometheus
+      GRAFANA_REPOSITORY: grafana
+      IMAGE_TAG: ${{ github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login no Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build & Push Prometheus
+        run: |
+          REGISTRY="${{ steps.login-ecr.outputs.registry }}"
+          docker build -t "$REGISTRY/${PROMETHEUS_REPOSITORY}:${IMAGE_TAG}" ./monitoring/prometheus
+          docker push "$REGISTRY/${PROMETHEUS_REPOSITORY}:${IMAGE_TAG}"
+          docker tag "$REGISTRY/${PROMETHEUS_REPOSITORY}:${IMAGE_TAG}" "$REGISTRY/${PROMETHEUS_REPOSITORY}:latest"
+          docker push "$REGISTRY/${PROMETHEUS_REPOSITORY}:latest"
+
+      - name: Build & Push Grafana
+        run: |
+          REGISTRY="${{ steps.login-ecr.outputs.registry }}"
+          docker build -t "$REGISTRY/${GRAFANA_REPOSITORY}:${IMAGE_TAG}" ./monitoring/grafana
+          docker push "$REGISTRY/${GRAFANA_REPOSITORY}:${IMAGE_TAG}"
+          docker tag "$REGISTRY/${GRAFANA_REPOSITORY}:${IMAGE_TAG}" "$REGISTRY/${GRAFANA_REPOSITORY}:latest"
+          docker push "$REGISTRY/${GRAFANA_REPOSITORY}:latest"
