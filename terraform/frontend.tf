@@ -83,6 +83,15 @@ module "cloudfront_distribution" {
         DomainName              = module.s3_frontend.bucket_regional_domain_name
         OriginId                = var.cloudfront_origin_id
         OriginAccessIdentityPath = module.cloudfront_oai.oai_cloudfront_access_identity_path
+      },
+      {
+        # Origem ALB para a API
+        DomainName            = module.alb_backend.lb_dns_name
+        OriginId              = "ALB-backend"
+        HttpPort              = 80
+        HttpsPort             = 443
+        OriginProtocolPolicy  = "http-only"
+        OriginSslProtocols    = ["TLSv1.2"]
       }
     ]
     DefaultBehavior = {
@@ -95,7 +104,22 @@ module "cloudfront_distribution" {
       ViewerProtocolPolicy      = var.cloudfront_viewer_protocol_policy
       FunctionArn               = var.cloudfront_function_arn != null ? var.cloudfront_function_arn : null
     }
-    OrderedBehaviors = var.cloudfront_ordered_behaviors
+    OrderedBehaviors = concat(
+      var.cloudfront_ordered_behaviors,
+      [
+        {
+          PathPattern             = "/api/*"
+          TargetOriginId           = "ALB-backend"
+          AllowedMethods           = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+          CachedMethods            = ["GET", "HEAD"]
+          CachePolicyId            = data.aws_cloudfront_cache_policy.managed_caching_disabled.id
+          OriginRequestPolicyId    = null
+          ResponseHeadersPolicyId  = null
+          ViewerProtocolPolicy     = "redirect-to-https"
+          FunctionArn              = null
+        }
+      ]
+    )
     CustomErrorResponses = var.cloudfront_custom_error_responses
     Restrictions = {
       Type      = var.cloudfront_restriction_type

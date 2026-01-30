@@ -160,7 +160,7 @@ module "ecs_service" {
   task_definition_arn     = module.ecs_task_definition.task_definition_arn
   desired_count           = var.ecs_service_desired_count
   launch_type             = var.ecs_service_launch_type
-  subnet_ids              = module.subnet_public.public_subnet_id
+  subnet_ids              = module.subnet_private.private_subnet_id
   security_group_ids      = [module.security_group_ecs.security_group_id]
   assign_public_ip         = var.ecs_service_assign_public_ip
   load_balancer = {
