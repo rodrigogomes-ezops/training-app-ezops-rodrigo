@@ -68,10 +68,15 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" ./backend
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          docker tag "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+          CLEAN_REPO="$(echo "$ECR_REPOSITORY" | tr -d '[:space:]')"
+          if [ -z "$CLEAN_REPO" ]; then
+            echo "ECR_REPOSITORY is empty. Set it to your ECR repo name (e.g. training-app-backend)."
+            exit 1
+          fi
+          docker build -t "$ECR_REGISTRY/$CLEAN_REPO:$IMAGE_TAG" ./backend
+          docker push "$ECR_REGISTRY/$CLEAN_REPO:$IMAGE_TAG"
+          docker tag "$ECR_REGISTRY/$CLEAN_REPO:$IMAGE_TAG" "$ECR_REGISTRY/$CLEAN_REPO:latest"
+          docker push "$ECR_REGISTRY/$CLEAN_REPO:latest"
 
       - name: Baixar task definition atual
         id: task-def
